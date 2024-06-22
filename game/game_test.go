@@ -11,13 +11,13 @@ func TestCreateGame(t *testing.T) {
 
 	game := CreateGame(CELL_HEIGHT, CELL_WIDTH)
 
-	cellHeight := len(game.Cells)
+	cellHeight := len(game.GetCells())
 
 	if cellHeight != CELL_HEIGHT {
 		t.Errorf(`Cells height value (%d) does not match the initial value (%d)`, cellHeight, CELL_HEIGHT)
 	}
 
-	cellWidth := len(game.Cells[0])
+	cellWidth := len(game.GetCells()[0])
 
 	if cellWidth != CELL_WIDTH {
 		t.Errorf(`Cells width value (%d) does not match the initial value (%d)`, cellWidth, CELL_WIDTH)

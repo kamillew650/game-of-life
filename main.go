@@ -19,5 +19,5 @@ func main() {
 	}
 
 	fmt.Println(value)
-	fmt.Println(game.Cells)
+	fmt.Println(game.GetCells())
 }
