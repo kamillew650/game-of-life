@@ -1,54 +1,98 @@
 package game
 
-import "errors"
-
-type GameError struct {
-	Message string
-}
+import (
+	"errors"
+	"fmt"
+	"game-of-life/game/area"
+	"time"
+)
 
 type Game struct {
-	cells         [][]bool
-	height, width int
+	currentArea, nextArea    area.Area
+	height, width, iteration int
 }
 
-func CreateGame(height, width int) *Game {
+var MIN_HEIGHT, MIN_WIDTH = 5, 5
+
+func CreateGame(height, width int) (*Game, error) {
+	if height < MIN_HEIGHT {
+		errors.New("Height is to low")
+	}
+
+	if width < MIN_WIDTH {
+		errors.New("Width is to low")
+	}
+
 	game := new(Game)
 	cells := make([][]bool, height)
 	for i := 0; i < height; i++ {
 		cells[i] = make([]bool, width)
 	}
-	game.cells = cells
+	game.currentArea = *area.CreateArea(height, width, true)
 	game.height = height
 	game.width = width
-	return game
+	game.iteration = 0
+	return game, nil
 }
 
-func (game *Game) GetCellValue(heightIndex int, widthIndex int) (bool, error) {
-	if (heightIndex+1) > game.height || heightIndex < 0 {
-		return false, errors.New("height index is out of scope")
-	}
-
-	if (widthIndex+1) > game.width || widthIndex < 0 {
-		return false, errors.New("width index is out of scope")
-	}
-
-	return game.cells[heightIndex][widthIndex], nil
+func (game *Game) getCurrentArea() *area.Area {
+	return &game.currentArea
 }
 
-func (game *Game) SetCellValue(heightIndex int, widthIndex int, value bool) error {
-	if (heightIndex+1) > game.height || heightIndex < 0 {
-		return errors.New("height index is out of scope")
+func (game *Game) calculateNextArea() error {
+	game.nextArea = *area.CreateArea(game.height, game.width, false)
+	for i := 0; i < game.height; i++ {
+		for j := 0; j < game.width; j++ {
+			nextState, err := game.currentArea.CalculateNextState(i, j)
+
+			if err != nil {
+				return errors.New("Fail to calculate next area")
+			}
+
+			err = game.nextArea.SetFieldValue(i, j, nextState)
+
+			if err != nil {
+				return errors.New("Fail to calculate next area")
+			}
+		}
 	}
 
-	if (widthIndex+1) > game.width || widthIndex < 0 {
-		return errors.New("width index is out of scope")
-	}
-
-	game.cells[heightIndex][widthIndex] = value
-
+	game.currentArea = game.nextArea
 	return nil
 }
 
-func (game *Game) GetCells() [][]bool {
-	return game.cells
+func mapBoolToSymbol(value bool) string {
+	if value {
+		return "X"
+	}
+
+	return "O"
+}
+
+func (game *Game) displayArea() {
+	area := game.currentArea
+
+	fmt.Printf("Iteration: %d \n", game.iteration)
+	for i := 0; i < game.height; i++ {
+		for j := 0; j < game.width; j++ {
+			value, err := area.GetFieldValue(i, j)
+			if err != nil {
+				return
+			}
+
+			fmt.Print(mapBoolToSymbol(value))
+			fmt.Print("  ")
+		}
+		fmt.Print("\n")
+	}
+}
+
+func (game *Game) StartSimulation(iteration int) {
+
+	for ; game.iteration < iteration; game.iteration++ {
+		game.displayArea()
+		game.calculateNextArea()
+		time.Sleep(2 * time.Second)
+		fmt.Print("\033[H\033[2J") // clear console
+	}
 }
