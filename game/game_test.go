@@ -1,6 +1,7 @@
 package game
 
 import (
+	"game-of-life/game/area"
 	"testing"
 )
 
@@ -9,7 +10,7 @@ func TestCreateGame(t *testing.T) {
 	const CELL_HEIGHT = 5
 	const CELL_WIDTH = 8
 
-	game, err := CreateGame(CELL_HEIGHT, CELL_WIDTH)
+	game, err := CreateGame(CELL_HEIGHT, CELL_WIDTH, area.Empty)
 
 	if err != nil {
 		t.Errorf(`Game parameters are to low`)

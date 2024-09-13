@@ -9,7 +9,7 @@ func TestCreateArea(t *testing.T) {
 	const CELL_HEIGHT = 4
 	const CELL_WIDTH = 8
 
-	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, false)
+	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, Empty)
 
 	cellHeight := len(area.GetFields())
 
@@ -30,7 +30,7 @@ func TestGetFieldValue(t *testing.T) {
 	const CELL_TEST_HEIGHT_INDEX = 1
 	const CELL_TEST_WIDTH_INDEX = 1
 
-	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, false)
+	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, Empty)
 
 	_, error := area.GetFieldValue(CELL_TEST_HEIGHT_INDEX, CELL_TEST_WIDTH_INDEX)
 
@@ -57,7 +57,7 @@ func TestSetFieldValue(t *testing.T) {
 	const CELL_TEST_HEIGHT_INDEX = 1
 	const CELL_TEST_WIDTH_INDEX = 1
 
-	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, false)
+	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, Empty)
 
 	heightIndexOutOfScopeError := area.SetFieldValue(-1, CELL_TEST_WIDTH_INDEX, true)
 
@@ -94,7 +94,7 @@ func TestCalculateNextStateForInactiveField(t *testing.T) {
 	const CELL_TEST_HEIGHT_INDEX = 1
 	const CELL_TEST_WIDTH_INDEX = 1
 
-	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, false)
+	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, Empty)
 
 	nextState, err := area.CalculateNextState(CELL_TEST_HEIGHT_INDEX, CELL_TEST_WIDTH_INDEX)
 	if err != nil {
@@ -148,7 +148,7 @@ func TestCalculateNextStateForActiveField(t *testing.T) {
 	const CELL_TEST_HEIGHT_INDEX = 1
 	const CELL_TEST_WIDTH_INDEX = 1
 
-	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, false)
+	area := CreateArea(CELL_HEIGHT, CELL_WIDTH, Empty)
 
 	err := area.SetFieldValue(CELL_TEST_HEIGHT_INDEX, CELL_TEST_WIDTH_INDEX, true)
 

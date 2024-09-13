@@ -14,13 +14,13 @@ type Game struct {
 
 var MIN_HEIGHT, MIN_WIDTH = 5, 5
 
-func CreateGame(height, width int) (*Game, error) {
+func CreateGame(height, width int, initialState area.InitialAreaState) (*Game, error) {
 	if height < MIN_HEIGHT {
-		errors.New("Height is to low")
+		return nil, errors.New("height is to low")
 	}
 
 	if width < MIN_WIDTH {
-		errors.New("Width is to low")
+		return nil, errors.New("width is to low")
 	}
 
 	game := new(Game)
@@ -28,7 +28,7 @@ func CreateGame(height, width int) (*Game, error) {
 	for i := 0; i < height; i++ {
 		cells[i] = make([]bool, width)
 	}
-	game.currentArea = *area.CreateArea(height, width, true)
+	game.currentArea = *area.CreateArea(height, width, initialState)
 	game.height = height
 	game.width = width
 	game.iteration = 0
@@ -40,19 +40,19 @@ func (game *Game) getCurrentArea() *area.Area {
 }
 
 func (game *Game) calculateNextArea() error {
-	game.nextArea = *area.CreateArea(game.height, game.width, false)
+	game.nextArea = *area.CreateArea(game.height, game.width, area.Empty)
 	for i := 0; i < game.height; i++ {
 		for j := 0; j < game.width; j++ {
 			nextState, err := game.currentArea.CalculateNextState(i, j)
 
 			if err != nil {
-				return errors.New("Fail to calculate next area")
+				return errors.New("fail to calculate next area")
 			}
 
 			err = game.nextArea.SetFieldValue(i, j, nextState)
 
 			if err != nil {
-				return errors.New("Fail to calculate next area")
+				return errors.New("fail to calculate next area")
 			}
 		}
 	}
@@ -87,12 +87,19 @@ func (game *Game) displayArea() {
 	}
 }
 
-func (game *Game) StartSimulation(iteration int) {
-
+func (game *Game) StartSimulation(iteration int) error {
+	fmt.Print("\033[H\033[2J") // clear console
 	for ; game.iteration < iteration; game.iteration++ {
 		game.displayArea()
-		game.calculateNextArea()
+		error := game.calculateNextArea()
+
+		if error != nil {
+			return error
+		}
+
 		time.Sleep(2 * time.Second)
 		fmt.Print("\033[H\033[2J") // clear console
 	}
+
+	return nil
 }

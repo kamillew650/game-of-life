@@ -2,6 +2,7 @@ package area
 
 import (
 	"errors"
+	"math/rand"
 )
 
 type Area struct {
@@ -9,7 +10,7 @@ type Area struct {
 	height, width, iteration int
 }
 
-func CreateArea(height int, width int, value bool) *Area {
+func CreateArea(height int, width int, initialState InitialAreaState) *Area {
 	area := new(Area)
 	cells := make([][]bool, height)
 	for i := 0; i < height; i++ {
@@ -20,17 +21,40 @@ func CreateArea(height int, width int, value bool) *Area {
 	area.width = width
 	area.iteration = 0
 
-	if value {
-		area.SetFieldValue(1, 2, true)
-		area.SetFieldValue(2, 2, true)
-		area.SetFieldValue(3, 2, true)
-		area.SetFieldValue(2, 3, true)
-		area.SetFieldValue(3, 3, true)
-		area.SetFieldValue(4, 3, true)
-
-	}
+	area.setInitialState(initialState)
 
 	return area
+}
+
+func (area *Area) setInitialState(initialState InitialAreaState) {
+	switch initialState {
+	case Random:
+		{
+			for i := 0; i <= area.height-1; i++ {
+				for j := 0; j <= area.width-1; j++ {
+					if rand.Intn(10) >= 5 {
+						area.SetFieldValue(i, j, true)
+					}
+				}
+			}
+		}
+	case Frog:
+		{
+			area.SetFieldValue(1, 2, true)
+			area.SetFieldValue(2, 2, true)
+			area.SetFieldValue(3, 2, true)
+			area.SetFieldValue(2, 3, true)
+			area.SetFieldValue(3, 3, true)
+			area.SetFieldValue(4, 3, true)
+		}
+
+	case Light:
+		{
+			area.SetFieldValue(1, 2, true)
+			area.SetFieldValue(2, 2, true)
+			area.SetFieldValue(3, 2, true)
+		}
+	}
 }
 
 func (area *Area) GetFieldValue(heightIndex int, widthIndex int) (bool, error) {
@@ -82,7 +106,6 @@ func (area *Area) CalculateNextState(heightIndex int, widthIndex int) (bool, err
 				}
 			}
 		}
-
 	}
 
 	if !currentCellState && activeCellsAround == 3 {
